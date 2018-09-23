@@ -1,0 +1,4 @@
+---
+# tasks file for tomcat
+- name: include installation tomcat
+  include: install_tomcat.yml

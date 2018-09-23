@@ -1,0 +1,86 @@
+---
+- name: Install OpenJDK
+  apt:
+    name: default-jre
+    state: present
+    update_cache: yes
+
+- name: Create group tomcat
+  group:
+    name: "{{ TOMCAT.GROUP_NAME }}"
+    state: present
+
+- name: Create user tomcat
+  user:
+    name: "{{ TOMCAT.USERNAME }}"
+    group: "{{ TOMCAT.GROUP_NAME }}"
+    home: "{{ TOMCAT.HOME }}"
+
+- name: Install tomcat
+  get_url:
+    url: "{{ TOMCAT.URL }}"
+    dest: "{{ TOMCAT.HOME }}"
+
+- name: Extract tomcat
+  unarchive:
+    src: "{{ TOMCAT.HOME }}/{{ TOMCAT_PAQUET }}.tar.gz"
+    dest: "{{ TOMCAT.HOME }}"
+
+- name: copy
+  shell: "cp -r {{ TOMCAT.HOME }}/{{ TOMCAT_PAQUET }}/* {{ TOMCAT.HOME }}" 
+
+- name: delete tar.gz
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ TOMCAT.HOME }}/{{ TOMCAT_PAQUET }}.tar.gz"
+    - "{{ TOMCAT.HOME }}/{{ TOMCAT_PAQUET }}"
+
+- name: Change group of {{ TOMCAT.HOME }}
+  file:
+    path: "{{ TOMCAT.HOME }}"
+    group: "{{ TOMCAT.GROUP_NAME }}"
+
+- name: Change group of different directories in folder tomcat
+  file:
+    path: "{{ TOMCAT.HOME }}/{{ item }}"
+    group: "{{ TOMCAT.GROUP_NAME }}"
+    owner: "{{ TOMCAT.USERNAME }}"
+    recurse: yes
+    mode: 755
+  with_items:
+    - webapps
+    - work
+    - temp
+    - logs
+    - conf
+
+#- name: Templating tomcat.service according to env
+#  template:
+#    src: tomcat.service
+#    dest: "{{ PATH_SERVICE }}"
+
+- name: Templating tomcat.service according to env
+  template:
+    src: setenv.sh
+    dest: "{{ TOMCAT.HOME }}/bin"
+
+- name: Copy sample.war into tomcat
+  copy:
+    src: sample.war
+    dest: "{{ TOMCAT.HOME }}/webapps"
+
+- name: start service tomcat
+  shell: /opt/tomcat/bin/startup.sh
+
+#- name: Start tomcat service
+#  service:
+#    name: tomcat
+#    state: started
+
+- name: Wait 300 seconfs for port {{ TOMCAT.PORT }}
+  wait_for:
+    port: "{{ TOMCAT.PORT }}"
+    host: "{{ TOMCAT.ADDRESS }}"
+    delay: 10 

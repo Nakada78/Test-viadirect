@@ -1,0 +1,20 @@
+---
+# defaults file for tomcat
+DEV:
+  xmx: 256m
+  xms: 256m
+
+PROD:
+  xms: 512m
+  xmx: 512m
+
+TOMCAT_PAQUET: apache-tomcat-8.5.34
+TOMCAT:
+  USERNAME: tomcat
+  GROUP_NAME: tomcat
+  HOME: /opt/tomcat
+  URL: "http://www-us.apache.org/dist/tomcat/tomcat-8/v8.5.34/bin/{{ TOMCAT_PAQUET }}.tar.gz"
+  PORT: 8080
+  ADDRESS: 127.0.0.1
+  
+PATH_SERVICE: /lib/systemd/system/

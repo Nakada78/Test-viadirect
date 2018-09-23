@@ -1,0 +1,9 @@
+---
+# handlers file for tomcat
+- name: Restart Tomcat
+  service:
+    name: tomcat
+    state: restarted
+
+- name: restart tomcat
+  shell: "{{ TOMCAT.HOME }}/bin/shutdown.sh && {{ TOMCAT.HOME }}/bin/startup.sh"
