@@ -56,11 +56,6 @@
     - logs
     - conf
 
-#- name: Templating tomcat.service according to env
-#  template:
-#    src: tomcat.service
-#    dest: "{{ PATH_SERVICE }}"
-
 - name: Templating tomcat.service according to env
   template:
     src: setenv.sh
@@ -72,7 +67,13 @@
     dest: "{{ TOMCAT.HOME }}/webapps"
 
 - name: start service tomcat
-  shell: /opt/tomcat/bin/startup.sh
+  shell: "{{ TOMCAT.HOME }}/bin/startup.sh"
+
+#Problem systemd
+#- name: Templating tomcat.service according to env
+#  template:
+#    src: tomcat.service
+#    dest: "{{ PATH_SERVICE }}"
 
 #- name: Start tomcat service
 #  service:
